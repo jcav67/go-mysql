@@ -43,3 +43,53 @@ func ListarContacts(db *sql.DB) {
 		fmt.Println("---------------------------------------------------------------")
 	}
 }
+
+// Obtener un contacto por Id
+func GetContactById(db *sql.DB, contactID int) {
+	//Query para buscar  un contacto
+	query := "SELECT * FROM contact where id = ?"
+
+	// Ejecutar la consulta
+	rowsResult := db.QueryRow(query, contactID)
+
+	//instanciacion del modelo
+	contact := models.Contact{}
+	var valueEmail sql.NullString
+
+	err := rowsResult.Scan(&contact.Id, &contact.Name, &valueEmail, &contact.Phone)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Fatalf("No se encontró registro con el ID %d", contactID)
+		} else {
+			log.Fatal("Error en la base de datos")
+		}
+	}
+
+	if valueEmail.Valid {
+		contact.Email = valueEmail.String
+	} else {
+		contact.Email = "No Email"
+	}
+	fmt.Println("\nInformación del contacto:")
+	fmt.Println("---------------------------------------------------------------")
+	fmt.Printf("ID %d, Nombre: %s, email: %s, telefono: %s\n", contact.Id, contact.Name, contact.Email, contact.Phone)
+	fmt.Println("---------------------------------------------------------------")
+}
+
+// Crear un nuevo contacto
+func CreateContact(db *sql.DB, newContact models.Contact) {
+	//Query para insertar nuevo contacto
+	query := "INSERT INTO contact(name, email, phone) VALUES(?,?,?)"
+
+	//Ejectuar la sentencia SQL
+	res, err := db.Exec(query, newContact.Name, newContact.Email, newContact.Phone)
+
+	if err != nil {
+		log.Fatal("ERROR ACA")
+	}
+
+	fmt.Println("Nuevo contacto registrado con éxito")
+	newContactId, _ := res.LastInsertId()
+	GetContactById(db, int(newContactId))
+}
