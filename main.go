@@ -1,26 +1,30 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jcav67/go-mysql/database"
+	"github.com/jcav67/go-mysql/handlers"
 )
 
 func main() {
-	dns := "jmilo67:Camilo_67@tcp(localhost:3306)/db_contacts"
 
-	// Abrir una conexion a la base de datos
-	db, err := sql.Open("mysql", dns)
-
+	db, err := database.Db_Connection()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("ERROR ACA")
+		log.Fatal("ERROR IN DATABASE CONNECTION")
 	}
+	defer db.Close()
 
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
+		log.Fatal("ERROR IN DATABASE CONNECTION")
 	}
 
+	handlers.ListarContacts(db)
+
 	fmt.Println("Conexion a la base de datos exitosa")
+
 }
