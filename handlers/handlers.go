@@ -88,8 +88,40 @@ func CreateContact(db *sql.DB, newContact models.Contact) {
 	if err != nil {
 		log.Fatal("ERROR ACA")
 	}
-
+	fmt.Println("---------------------------------------------------------------")
 	fmt.Println("Nuevo contacto registrado con éxito")
+	fmt.Println("---------------------------------------------------------------")
 	newContactId, _ := res.LastInsertId()
 	GetContactById(db, int(newContactId))
+}
+
+// Update un nuevo contacto
+func UpadateContact(db *sql.DB, newContact models.Contact) {
+	//Query para insertar nuevo contacto
+	query := "UPDATE contact SET name = ?, email = ?, phone=? WHERE id = ?"
+
+	//Ejectuar la sentencia SQL
+	_, err := db.Exec(query, newContact.Name, newContact.Email, newContact.Phone, newContact.Id)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Println("---------------------------------------------------------------")
+	fmt.Println("Registro actualizado correctamente")
+	fmt.Println("---------------------------------------------------------------")
+	GetContactById(db, newContact.Id)
+}
+
+// Borrar un registro de la bd
+func DeleteContactById(db *sql.DB, contactID int) {
+	// Query pára elimianr un registro
+	query := "DELETE FROM contact WHERE id = ?"
+
+	//Ejecutar la sentencia SQL
+	_, err := db.Exec(query, contactID)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Println("---------------------------------------------------------------")
+	fmt.Printf("El registro con id %v fue eliminado con exito\n", contactID)
+	fmt.Println("---------------------------------------------------------------")
 }
